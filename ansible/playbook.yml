@@ -1,0 +1,22 @@
+---
+- name: Configure pulse-server
+  hosts: pulse_servers
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Ensure base packages are installed
+      ansible.builtin.apt:
+        name:
+          - curl
+          - ufw
+          - ca-certificates
+        state: present
+
+    - name: Set timezone
+      community.general.timezone:
+        name: Europe/Skopje
