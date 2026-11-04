@@ -20,3 +20,40 @@
     - name: Set timezone
       community.general.timezone:
         name: Europe/Skopje
+
+    - name: Allow SSH through the firewall
+      community.general.ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+
+    - name: Set firewall default to deny incoming
+      community.general.ufw:
+        direction: incoming
+        policy: deny
+
+    - name: Enable the firewall
+      community.general.ufw:
+        state: enabled
+
+    - name: Disable SSH password authentication
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/00-hardening.conf
+        content: "PasswordAuthentication no\n"
+        owner: root
+        group: root
+        mode: "0644"
+        validate: "sshd -t -f %s"
+      notify: Restart ssh
+
+    - name: Remove the old (ineffective) hardening file
+      ansible.builtin.file:
+        path: /etc/ssh/sshd_config.d/99-hardening.conf
+        state: absent
+      notify: Restart ssh
+
+  handlers:
+    - name: Restart ssh
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
