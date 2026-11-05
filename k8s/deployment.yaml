@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulse
+  template:
+    metadata:
+      labels:
+        app: pulse
+    spec:
+      containers:
+        - name: pulse
+          image: docker.io/library/pulse:local
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PULSE_SITES
+              value: "https://github.com,https://www.google.com"
