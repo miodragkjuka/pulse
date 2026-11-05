@@ -52,6 +52,28 @@
         state: absent
       notify: Restart ssh
 
+    - name: Allow Kubernetes API through the firewall
+      community.general.ufw:
+        rule: allow
+        port: "6443"
+        proto: tcp
+
+    - name: Check if k3s is already installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/k3s
+      register: k3s_binary
+
+    - name: Download the k3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s-install.sh
+        mode: "0755"
+      when: not k3s_binary.stat.exists
+
+    - name: Install k3s
+      ansible.builtin.command: /tmp/k3s-install.sh
+      when: not k3s_binary.stat.exists
+
   handlers:
     - name: Restart ssh
       ansible.builtin.service:
