@@ -1,0 +1,8 @@
+Pulse has been deployed.
+
+To access it, forward the pod's port to your workstation:
+
+  export POD_NAME=$(kubectl get pods -l app=pulse -o jsonpath="{.items[0].metadata.name}")
+  kubectl port-forward $POD_NAME 8080:5000
+
+Then visit http://127.0.0.1:8080
